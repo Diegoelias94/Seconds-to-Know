@@ -13,6 +13,7 @@ const connectDB = async () => {
     console.log('PostgreSQL connected');
   } catch (error) {
     console.error('Error connecting to PostgreSQL:', error.message);
+    console.error('Connection string:', process.env.DATABASE_URL);
     process.exit(1);
   }
 };
