@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { connectDB } = require('./config/db');
 
 const app = express();
@@ -12,8 +13,21 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// API routes
 app.use('/api', require('./routes/api'));
+
+// Handle root route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
+
+// Handle any routes not covered above
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
 
 const PORT = process.env.PORT || 5000;
 
