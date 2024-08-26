@@ -1,15 +1,18 @@
 {
   "name": "seconds-to-know",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "backend/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node backend/server.js",
+    "build": "echo 'No build step required'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "express": "^4.17.1",
+    "pg": "^8.7.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0"
   }
 }

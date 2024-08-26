@@ -1,4 +1,4 @@
-const API_URL = 'https://your-render-app-name.onrender.com/api';
+const API_URL = 'https://seconds-to-know.onrender.com/api';
 const USERNAME = 'testuser'; // Replace with actual user authentication
 
 const questions = [
