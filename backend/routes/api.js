@@ -11,8 +11,8 @@ router.get('/scores/:username', async (req, res) => {
         );
         res.json(result.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -34,8 +34,8 @@ router.post('/update-score/:username', async (req, res) => {
         );
         res.json(result.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -48,8 +48,8 @@ router.get('/check-played/:username', async (req, res) => {
         );
         res.json({ played: result.rows.length > 0 });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
