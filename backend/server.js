@@ -19,4 +19,9 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-console.log('Database URL:', process.env.DATABASE_URL.replace(/:[^:@]{1,}@/, ':****@'));
+console.log('Database connection details:', {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+});
