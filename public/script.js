@@ -28,8 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const pointsGained = getElement('points-gained');
     const leaderboard = getElement('leaderboard');
     const submitButton = getElement('submit-button');
-    const loginButton = getElement('login-button');
-    const registerButton = getElement('register-button');
     const authTitle = getElement('auth-title');
     const authForm = getElement('auth-form');
     const emailInput = getElement('email-input');
@@ -54,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAuthMode();
     });
 
-    if (authSubmitButton) authSubmitButton.addEventListener('click', function() {
+    if (authSubmitButton) authSubmitButton.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent form submission
         if (isLoginMode) {
             login();
         } else {
@@ -63,8 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function login() {
+        console.log('Login function called');
         const username = usernameInput.value;
         const password = passwordInput.value;
+        console.log('Attempting login with:', { username, password });
         try {
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ username, password })
             });
             const data = await response.json();
+            console.log('Login response:', data);
             if (response.ok) {
                 token = data.token;
                 localStorage.setItem('token', token);
@@ -89,9 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function register() {
+        console.log('Register function called');
         const username = usernameInput.value;
         const email = emailInput.value;
         const password = passwordInput.value;
+        console.log('Attempting registration with:', { username, email, password });
         try {
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
@@ -99,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ username, email, password })
             });
             const data = await response.json();
+            console.log('Registration response:', data);
             if (response.ok) {
                 alert('Registration successful. Please login.');
                 toggleAuthMode(); // Switch back to login mode
@@ -117,8 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (startGameButton) startGameButton.addEventListener('click', startGameFlow);
     if (playAgainButton) playAgainButton.addEventListener('click', () => showScreen(modeSelectionScreen));
     if (submitButton) submitButton.addEventListener('click', checkAnswer);
-    if (loginButton) loginButton.addEventListener('click', login);
-    if (registerButton) registerButton.addEventListener('click', register);
 
     // ... (rest of your existing code)
 
