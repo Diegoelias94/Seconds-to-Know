@@ -52,14 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAuthMode();
     });
 
-    if (authSubmitButton) authSubmitButton.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent form submission
-        if (isLoginMode) {
-            login();
-        } else {
-            register();
-        }
-    });
+    if (authSubmitButton) {
+        console.log('Auth submit button found');
+        authSubmitButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Auth submit button clicked');
+            if (isLoginMode) {
+                login();
+            } else {
+                register();
+            }
+        });
+    } else {
+        console.error('Auth submit button not found');
+    }
 
     async function login() {
         console.log('Login function called');
@@ -67,14 +73,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = passwordInput.value;
         console.log('Attempting login with:', { username, password: '****' });
         try {
+            console.log('Sending request to:', `${API_URL}/login`);
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
+            console.log('Response received:', response);
             console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Login response:', data);
+            console.log('Login response data:', data);
             if (response.ok) {
                 token = data.token;
                 localStorage.setItem('token', token);
