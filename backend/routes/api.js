@@ -21,6 +21,9 @@ router.post('/register', async (req, res) => {
         res.status(201).json({ message: 'User registered successfully', userId: result.rows[0].id });
     } catch (err) {
         console.error('Error in user registration:', err);
+        if (err.code === '23505') { // unique_violation error code
+            return res.status(400).json({ error: 'Username or email already exists' });
+        }
         res.status(500).json({ error: 'Server error' });
     }
 });
