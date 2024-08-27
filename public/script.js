@@ -70,38 +70,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function login() {
         console.log('Login function called');
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        console.log('Attempting login with:', { username, password: '****' });
         try {
-            const username = usernameInput.value;
-            const password = passwordInput.value;
-            console.log('Credentials retrieved');
-            
             console.log('About to fetch:', `${API_URL}/login`);
-            try {
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                console.log('Fetch completed, response:', response);
-                
-                try {
-                    const data = await response.json();
-                    console.log('Response data:', data);
-                    if (response.ok) {
-                        token = data.token;
-                        localStorage.setItem('token', token);
-                        authModal.style.display = 'none';
-                        authButton.style.display = 'none';
-                        startButton.disabled = false;
-                        alert('Login successful!');
-                    } else {
-                        alert(data.error || 'Login failed');
-                    }
-                } catch (jsonError) {
-                    console.error('Error parsing JSON:', jsonError);
-                }
-            } catch (fetchError) {
-                console.error('Fetch error:', fetchError);
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            console.log('Fetch completed, response status:', response.status);
+            const data = await response.json();
+            console.log('Login response data:', data);
+            if (response.ok) {
+                token = data.token;
+                localStorage.setItem('token', token);
+                authModal.style.display = 'none';
+                authButton.style.display = 'none';
+                startButton.disabled = false;
+                alert('Login successful!');
+            } else {
+                alert(data.error || 'Login failed');
             }
         } catch (error) {
             console.error('Login error:', error);
@@ -122,10 +112,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
             });
-            console.log('Fetch completed, response:', response);
-            console.log('Response status:', response.status);
+            console.log('Fetch completed, response status:', response.status);
             const data = await response.json();
-            console.log('Response data:', data);
+            console.log('Registration response data:', data);
             if (response.ok) {
                 alert('Registration successful. Please login.');
                 toggleAuthMode(); // Switch back to login mode
