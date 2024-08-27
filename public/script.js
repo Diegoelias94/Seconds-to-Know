@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const API_URL = 'https://seconds-to-know.onrender.com/api';
+    console.log('API_URL:', API_URL);
     let token = localStorage.getItem('token');
     let currentGameMode = 10;
 
@@ -73,16 +74,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = passwordInput.value;
         console.log('Attempting login with:', { username, password: '****' });
         try {
-            console.log('Sending request to:', `${API_URL}/login`);
+            console.log('About to fetch:', `${API_URL}/login`);
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            console.log('Response received:', response);
+            console.log('Fetch completed, response:', response);
             console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Login response data:', data);
+            console.log('Response data:', data);
             if (response.ok) {
                 token = data.token;
                 localStorage.setItem('token', token);
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('An error occurred during login');
+            alert('An error occurred during login: ' + error.message);
         }
     }
 
@@ -104,15 +105,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const username = usernameInput.value;
         const email = emailInput.value;
         const password = passwordInput.value;
-        console.log('Attempting registration with:', { username, email, password });
+        console.log('Attempting registration with:', { username, email, password: '****' });
         try {
+            console.log('About to fetch:', `${API_URL}/register`);
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
             });
+            console.log('Fetch completed, response:', response);
+            console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Registration response:', data);
+            console.log('Response data:', data);
             if (response.ok) {
                 alert('Registration successful. Please login.');
                 toggleAuthMode(); // Switch back to login mode
@@ -121,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Registration error:', error);
-            alert('An error occurred during registration');
+            alert('An error occurred during registration: ' + error.message);
         }
     }
 
