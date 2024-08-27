@@ -8,6 +8,9 @@ const jwt = require('jsonwebtoken');
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
+        if (!username || !email || !password) {
+            return res.status(400).json({ error: 'Username, email, and password are required' });
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const result = await pool.query(

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
-    email VARCHAR(255) UNIQUE,
+    email VARCHAR(255),  -- Remove UNIQUE and make it nullable
     password_hash VARCHAR(255) NOT NULL
 );
 
