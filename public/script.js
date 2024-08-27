@@ -24,6 +24,7 @@ const scoreboardElement = document.getElementById('scoreboard');
 const loginButton = document.getElementById('login-button');
 const registerButton = document.getElementById('register-button');
 const usernameInput = document.getElementById('username-input');
+const emailInput = document.getElementById('email-input'); // Add this line
 const passwordInput = document.getElementById('password-input');
 const authContainer = document.getElementById('auth-container');
 const gameModeButtons = document.querySelectorAll('.game-mode-button');
