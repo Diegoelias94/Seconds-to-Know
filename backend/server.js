@@ -10,7 +10,9 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://seconds-to-know.onrender.com/'
+}));
 app.use(express.json());
 
 // Serve static files from the 'public' directory

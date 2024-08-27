@@ -65,13 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Login function called');
         const username = usernameInput.value;
         const password = passwordInput.value;
-        console.log('Attempting login with:', { username, password });
+        console.log('Attempting login with:', { username, password: '****' });
         try {
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
+            console.log('Response status:', response.status);
             const data = await response.json();
             console.log('Login response:', data);
             if (response.ok) {
