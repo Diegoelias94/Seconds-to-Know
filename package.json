@@ -4,14 +4,13 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "build": "echo 'No build step required'",
-    "postinstall": "npm rebuild bcrypt --build-from-source"
+    "build": "echo 'No build step required'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
