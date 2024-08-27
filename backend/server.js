@@ -10,30 +10,25 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: 'https://seconds-to-know.onrender.com/'
-}));
+app.use(cors());
 app.use(express.json());
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
-app.use('/api', require('./routes/api'));
+app.post('/api/login', loginHandler);
+app.post('/api/register', registerHandler);
+app.get('/api/test', (req, res) => res.json({ message: 'API is working' }));
 
-// Handle root route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+// For any other routes, serve the index.html file
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Handle any routes not covered above
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-});
+const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 console.log('Database connection details:', {
   host: process.env.DB_HOST,

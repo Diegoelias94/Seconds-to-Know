@@ -183,16 +183,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function testAPIConnection() {
         console.log('Testing API connection');
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', `${API_URL}/test`, true);
-        xhr.onload = function () {
-            console.log('XHR status:', xhr.status);
-            console.log('XHR response:', xhr.responseText);
-        };
-        xhr.onerror = function () {
-            console.error('XHR error');
-        };
-        xhr.send();
+        fetch(`${API_URL}/test`)
+            .then(response => {
+                console.log('API test response status:', response.status);
+                return response.text();
+            })
+            .then(data => console.log('API test response:', data))
+            .catch(error => console.error('API test error:', error));
     }
 
     // Call this function when the page loads
