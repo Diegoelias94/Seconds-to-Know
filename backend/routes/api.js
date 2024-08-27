@@ -1,54 +1,112 @@
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/db');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+// User registration
+router.post('/register', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await pool.query(
+            'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
+            [username, email, hashedPassword]
+        );
+
+        res.status(201).json({ message: 'User registered successfully', userId: result.rows[0].id });
+    } catch (err) {
+        console.error('Error in user registration:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// User login
+router.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const user = result.rows[0];
+        const validPassword = await bcrypt.compare(password, user.password_hash);
+
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token });
+    } catch (err) {
+        console.error('Error in user login:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token) return res.status(401).json({ error: 'Access denied' });
+
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.userId = verified.userId;
+        next();
+    } catch (err) {
+        res.status(400).json({ error: 'Invalid token' });
+    }
+};
 
 // Get user's scores
-router.get('/scores/:username', async (req, res) => {
+router.get('/scores', verifyToken, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT * FROM scores WHERE username = $1 ORDER BY date DESC',
-            [req.params.username]
+            'SELECT * FROM scores WHERE user_id = $1 ORDER BY date DESC',
+            [req.userId]
         );
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
+        console.error('Error in /scores:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
 // Update user's score
-router.post('/update-score/:username', async (req, res) => {
+router.post('/update-score', verifyToken, async (req, res) => {
     try {
-        const { username } = req.params;
-        const { score } = req.body;
+        const { score, game_mode } = req.body;
         const date = new Date();
 
         await pool.query(
-            'INSERT INTO scores (username, score, date) VALUES ($1, $2, $3)',
-            [username, score, date]
+            'INSERT INTO scores (user_id, score, date, game_mode) VALUES ($1, $2, $3, $4)',
+            [req.userId, score, date, game_mode]
         );
 
         const result = await pool.query(
-            'SELECT * FROM scores WHERE username = $1 ORDER BY date DESC',
-            [username]
+            'SELECT * FROM scores WHERE user_id = $1 ORDER BY date DESC',
+            [req.userId]
         );
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
+        console.error('Error in /update-score:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
 // Check if user has played today
-router.get('/check-played/:username', async (req, res) => {
+router.get('/check-played', verifyToken, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT * FROM scores WHERE username = $1 AND date::date = CURRENT_DATE',
-            [req.params.username]
+            'SELECT * FROM scores WHERE user_id = $1 AND date::date = CURRENT_DATE',
+            [req.userId]
         );
         res.json({ played: result.rows.length > 0 });
     } catch (err) {
-        console.error(err);
+        console.error('Error in /check-played:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
