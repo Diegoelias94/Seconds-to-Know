@@ -1,5 +1,6 @@
 const API_URL = 'https://seconds-to-know.onrender.com/api';
-const USERNAME = 'testuser'; // Replace with actual user authentication
+let token = localStorage.getItem('token');
+let currentGameMode = 10;
 
 const questions = [
     { question: "Year of the moon landing", answer: "1969" },
@@ -20,12 +21,78 @@ const answerInput = document.getElementById('answer-input');
 const startButton = document.getElementById('start-button');
 const submitButton = document.getElementById('submit-button');
 const scoreboardElement = document.getElementById('scoreboard');
+const loginButton = document.getElementById('login-button');
+const registerButton = document.getElementById('register-button');
+const usernameInput = document.getElementById('username-input');
+const passwordInput = document.getElementById('password-input');
+const authContainer = document.getElementById('auth-container');
+const gameModeButtons = document.querySelectorAll('.game-mode-button');
 
 startButton.addEventListener('click', startGame);
 submitButton.addEventListener('click', checkAnswer);
+loginButton.addEventListener('click', login);
+registerButton.addEventListener('click', register);
+gameModeButtons.forEach(button => {
+    button.addEventListener('click', () => setGameMode(parseInt(button.dataset.mode)));
+});
+
+function setGameMode(mode) {
+    currentGameMode = mode;
+    gameModeButtons.forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+}
+
+async function login() {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            token = data.token;
+            localStorage.setItem('token', token);
+            authContainer.style.display = 'none';
+            startButton.disabled = false;
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+    }
+}
+
+async function register() {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    try {
+        const response = await fetch(`${API_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert('Registration successful. Please login.');
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+    }
+}
 
 async function startGame() {
-    const response = await fetch(`${API_URL}/check-played/${USERNAME}`);
+    if (!token) {
+        alert('Please login first');
+        return;
+    }
+    const response = await fetch(`${API_URL}/check-played`, {
+        headers: { 'Authorization': token }
+    });
     const data = await response.json();
     if (data.played) {
         alert("You've already played today. Come back tomorrow for a new question!");
@@ -39,7 +106,7 @@ async function startGame() {
     answerInput.disabled = false;
     submitButton.disabled = false;
     startButton.disabled = true;
-    timeLeft = 10;
+    timeLeft = currentGameMode;
     timerElement.textContent = timeLeft;
     
     timer = setInterval(() => {
@@ -62,7 +129,7 @@ function checkAnswer() {
 }
 
 async function endRound(isCorrect) {
-    const score = isCorrect ? timeLeft : 0;
+    const score = isCorrect ? calculateScore(timeLeft, currentGameMode) : 0;
     if (isCorrect) {
         alert(`Correct! You scored ${score} points.`);
     } else {
@@ -76,13 +143,34 @@ async function endRound(isCorrect) {
     await updateScoreboard(score);
 }
 
+function calculateScore(timeLeft, gameMode) {
+    // Base score is the time left
+    let score = timeLeft;
+    
+    // Adjust score based on game mode
+    switch (gameMode) {
+        case 10:
+            score *= 3; // Highest multiplier for the hardest mode
+            break;
+        case 20:
+            score *= 2;
+            break;
+        case 30:
+            score *= 1.5;
+            break;
+    }
+    
+    return Math.round(score);
+}
+
 async function updateScoreboard(score) {
-    const response = await fetch(`${API_URL}/update-score/${USERNAME}`, {
+    const response = await fetch(`${API_URL}/update-score`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': token
         },
-        body: JSON.stringify({ score: score }),
+        body: JSON.stringify({ score: score, game_mode: `${currentGameMode}_seconds` }),
     });
     const scores = await response.json();
     displayScoreboard(scores);
@@ -91,7 +179,7 @@ async function updateScoreboard(score) {
 function displayScoreboard(scores) {
     let scoreboardHTML = '<h2>Your Scoreboard</h2><ul>';
     scores.forEach((s, index) => {
-        scoreboardHTML += `<li>Day ${index + 1}: ${s.score} points</li>`;
+        scoreboardHTML += `<li>Day ${index + 1}: ${s.score} points (${s.game_mode})</li>`;
     });
     scoreboardHTML += '</ul>';
 
@@ -99,16 +187,27 @@ function displayScoreboard(scores) {
     scoreboardElement.style.display = 'block';
 }
 
-// Check if the user has already played today when the page loads
 async function checkIfPlayedToday() {
-    const response = await fetch(`${API_URL}/check-played/${USERNAME}`);
+    if (!token) {
+        authContainer.style.display = 'block';
+        startButton.disabled = true;
+        return;
+    }
+    
+    const response = await fetch(`${API_URL}/check-played`, {
+        headers: { 'Authorization': token }
+    });
     const data = await response.json();
     if (data.played) {
         startButton.textContent = 'Play Again Tomorrow';
         startButton.disabled = true;
-        const scoresResponse = await fetch(`${API_URL}/scores/${USERNAME}`);
+        const scoresResponse = await fetch(`${API_URL}/scores`, {
+            headers: { 'Authorization': token }
+        });
         const scores = await scoresResponse.json();
         displayScoreboard(scores);
+    } else {
+        startButton.disabled = false;
     }
 }
 

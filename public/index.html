@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +9,17 @@
 <body>
     <div id="game-container">
         <h1>Seconds to Know</h1>
+        <div id="auth-container">
+            <input type="text" id="username-input" placeholder="Username">
+            <input type="password" id="password-input" placeholder="Password">
+            <button id="login-button">Login</button>
+            <button id="register-button">Register</button>
+        </div>
+        <div id="game-mode-container">
+            <button class="game-mode-button" data-mode="10">10 Seconds</button>
+            <button class="game-mode-button" data-mode="20">20 Seconds</button>
+            <button class="game-mode-button" data-mode="30">30 Seconds</button>
+        </div>
         <div id="timer">10</div>
         <div id="question"></div>
         <input type="text" id="answer-input" disabled>
