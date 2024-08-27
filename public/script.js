@@ -70,29 +70,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function login() {
         console.log('Login function called');
-        const username = usernameInput.value;
-        const password = passwordInput.value;
-        console.log('Attempting login with:', { username, password: '****' });
         try {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            console.log('Credentials retrieved');
+            
             console.log('About to fetch:', `${API_URL}/login`);
-            const response = await fetch(`${API_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            console.log('Fetch completed, response:', response);
-            console.log('Response status:', response.status);
-            const data = await response.json();
-            console.log('Response data:', data);
-            if (response.ok) {
-                token = data.token;
-                localStorage.setItem('token', token);
-                authModal.style.display = 'none';
-                authButton.style.display = 'none';
-                startButton.disabled = false;
-                alert('Login successful!');
-            } else {
-                alert(data.error || 'Login failed');
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                console.log('Fetch completed, response:', response);
+                
+                try {
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    if (response.ok) {
+                        token = data.token;
+                        localStorage.setItem('token', token);
+                        authModal.style.display = 'none';
+                        authButton.style.display = 'none';
+                        startButton.disabled = false;
+                        alert('Login successful!');
+                    } else {
+                        alert(data.error || 'Login failed');
+                    }
+                } catch (jsonError) {
+                    console.error('Error parsing JSON:', jsonError);
+                }
+            } catch (fetchError) {
+                console.error('Fetch error:', fetchError);
             }
         } catch (error) {
             console.error('Login error:', error);
@@ -171,4 +180,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Call initialization functions
     checkLoggedIn();
+
+    function testAPIConnection() {
+        console.log('Testing API connection');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', `${API_URL}/test`, true);
+        xhr.onload = function () {
+            console.log('XHR status:', xhr.status);
+            console.log('XHR response:', xhr.responseText);
+        };
+        xhr.onerror = function () {
+            console.error('XHR error');
+        };
+        xhr.send();
+    }
+
+    // Call this function when the page loads
+    testAPIConnection();
 });
