@@ -43,6 +43,24 @@ function setGameMode(mode) {
     document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
 }
 
+const authButton = document.getElementById('auth-button');
+const authModal = document.getElementById('auth-modal');
+const closeModal = document.getElementsByClassName('close')[0];
+
+authButton.onclick = function() {
+    authModal.style.display = "block";
+}
+
+closeModal.onclick = function() {
+    authModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == authModal) {
+        authModal.style.display = "none";
+    }
+}
+
 async function login() {
     const username = usernameInput.value;
     const password = passwordInput.value;
@@ -56,7 +74,8 @@ async function login() {
         if (response.ok) {
             token = data.token;
             localStorage.setItem('token', token);
-            authContainer.style.display = 'none';
+            authModal.style.display = 'none';
+            authButton.style.display = 'none';
             startButton.disabled = false;
         } else {
             alert(data.error);
@@ -79,6 +98,7 @@ async function register() {
         const data = await response.json();
         if (response.ok) {
             alert('Registration successful. Please login.');
+            emailInput.value = ''; // Clear email field after successful registration
         } else {
             alert(data.error);
         }
@@ -166,19 +186,33 @@ function calculateScore(timeLeft, gameMode) {
 }
 
 async function updateScoreboard(score) {
-    const response = await fetch(`${API_URL}/update-score`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-        },
-        body: JSON.stringify({ score: score, game_mode: `${currentGameMode}_seconds` }),
-    });
-    const scores = await response.json();
-    displayScoreboard(scores);
+    try {
+        const response = await fetch(`${API_URL}/update-score`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body: JSON.stringify({ score: score, game_mode: `${currentGameMode}_seconds` }),
+        });
+        const data = await response.json();
+        if (Array.isArray(data)) {
+            displayScoreboard(data);
+        } else {
+            console.error('Unexpected response format:', data);
+            displayScoreboard([]);
+        }
+    } catch (error) {
+        console.error('Error updating scoreboard:', error);
+        displayScoreboard([]);
+    }
 }
 
 function displayScoreboard(scores) {
+    if (!Array.isArray(scores)) {
+        console.error('Invalid scores data:', scores);
+        scores = [];
+    }
     let scoreboardHTML = '<h2>Your Scoreboard</h2><ul>';
     scores.forEach((s, index) => {
         scoreboardHTML += `<li>Day ${index + 1}: ${s.score} points (${s.game_mode})</li>`;

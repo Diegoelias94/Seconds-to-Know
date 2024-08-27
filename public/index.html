@@ -9,25 +9,52 @@
 <body>
     <div id="game-container">
         <h1>Seconds to Know</h1>
-        <div id="auth-container">
-            <input type="text" id="username-input" placeholder="Username">
-            <input type="email" id="email-input" placeholder="Email">
-            <input type="password" id="password-input" placeholder="Password">
-            <button id="login-button">Login</button>
-            <button id="register-button">Register</button>
+        <button id="auth-button" class="btn">Login / Register</button>
+
+        <div id="mode-selection" class="game-screen">
+            <h2>Select Game Mode</h2>
+            <select id="game-mode-select">
+                <option value="10">10 Seconds</option>
+                <option value="20">20 Seconds</option>
+                <option value="30">30 Seconds</option>
+            </select>
+            <button id="start-game-button" class="btn">Play</button>
         </div>
-        <div id="game-mode-container">
-            <button class="game-mode-button" data-mode="10">10 Seconds</button>
-            <button class="game-mode-button" data-mode="20">20 Seconds</button>
-            <button class="game-mode-button" data-mode="30">30 Seconds</button>
+
+        <div id="countdown" class="game-screen" style="display: none;">
+            <h2>Get Ready!</h2>
+            <div id="countdown-timer">5</div>
         </div>
-        <div id="timer">10</div>
-        <div id="question"></div>
-        <input type="text" id="answer-input" disabled>
-        <button id="start-button" class="btn">Start Game</button>
-        <button id="submit-button" class="btn" disabled>Submit</button>
-        <div id="scoreboard"></div>
+
+        <div id="game-play" class="game-screen" style="display: none;">
+            <div id="timer"></div>
+            <div id="question"></div>
+            <input type="text" id="answer-input">
+            <button id="submit-button" class="btn">Submit</button>
+        </div>
+
+        <div id="game-result" class="game-screen" style="display: none;">
+            <h2 id="result-message"></h2>
+            <p id="points-gained"></p>
+            <div id="leaderboard"></div>
+            <button id="play-again-button" class="btn">Play Again</button>
+        </div>
     </div>
+
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login / Register</h2>
+            <div id="auth-form">
+                <input type="text" id="username-input" placeholder="Username">
+                <input type="email" id="email-input" placeholder="Email (for registration)">
+                <input type="password" id="password-input" placeholder="Password">
+                <button id="login-button" class="btn">Login</button>
+                <button id="register-button" class="btn">Register</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
