@@ -30,6 +30,86 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = getElement('submit-button');
     const loginButton = getElement('login-button');
     const registerButton = getElement('register-button');
+    const authTitle = getElement('auth-title');
+    const authForm = getElement('auth-form');
+    const emailInput = getElement('email-input');
+    const authSubmitButton = getElement('auth-submit-button');
+    const authToggleLink = getElement('auth-toggle-link');
+
+    let isLoginMode = true;
+
+    function toggleAuthMode() {
+        isLoginMode = !isLoginMode;
+        authTitle.textContent = isLoginMode ? 'Login' : 'Register';
+        authSubmitButton.textContent = isLoginMode ? 'Login' : 'Register';
+        emailInput.style.display = isLoginMode ? 'none' : 'block';
+        authToggleLink.textContent = isLoginMode ? 'Register' : 'Login';
+        document.getElementById('auth-toggle').firstChild.textContent = isLoginMode 
+            ? "Don't have an account? "
+            : "Already have an account? ";
+    }
+
+    if (authToggleLink) authToggleLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleAuthMode();
+    });
+
+    if (authSubmitButton) authSubmitButton.addEventListener('click', function() {
+        if (isLoginMode) {
+            login();
+        } else {
+            register();
+        }
+    });
+
+    async function login() {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                token = data.token;
+                localStorage.setItem('token', token);
+                authModal.style.display = 'none';
+                authButton.style.display = 'none';
+                startButton.disabled = false;
+                alert('Login successful!');
+            } else {
+                alert(data.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login');
+        }
+    }
+
+    async function register() {
+        const username = usernameInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        try {
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Registration successful. Please login.');
+                toggleAuthMode(); // Switch back to login mode
+            } else {
+                alert(data.error || 'Registration failed');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            alert('An error occurred during registration');
+        }
+    }
 
     // Safely add event listeners
     if (authButton) authButton.onclick = function() { authModal.style.display = "block"; };
