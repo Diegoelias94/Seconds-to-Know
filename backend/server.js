@@ -22,6 +22,23 @@ const pool = new Pool({
   }
 });
 
+// Test database connection
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+  } else {
+    console.log('Successfully connected to the database');
+    client.query('SELECT NOW()', (err, result) => {
+      release();
+      if (err) {
+        console.error('Error executing query:', err);
+      } else {
+        console.log('Database query result:', result.rows);
+      }
+    });
+  }
+});
+
 // Login handler
 async function loginHandler(req, res) {
   try {
@@ -51,20 +68,24 @@ async function loginHandler(req, res) {
 async function registerHandler(req, res) {
   try {
     const { username, email, password } = req.body;
+    console.log('Received registration request for:', { username, email });
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    console.log('Attempting to insert user into database');
     const result = await pool.query(
       'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
       [username, email, hashedPassword]
     );
 
+    console.log('User registered successfully:', result.rows[0]);
     res.status(201).json({ message: 'User registered successfully', userId: result.rows[0].id });
   } catch (err) {
     console.error('Error in registration:', err);
     if (err.code === '23505') { // unique_violation error code
       return res.status(400).json({ error: 'Username or email already exists' });
     }
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 }
 
