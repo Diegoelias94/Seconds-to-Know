@@ -88,9 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 token = data.token;
                 localStorage.setItem('token', token);
-                authModal.style.display = 'none';
-                authButton.style.display = 'none';
-                startButton.disabled = false;
+                if (authModal) authModal.style.display = 'none';
+                if (authButton) authButton.style.display = 'none';
+                if (startGameButton) startGameButton.disabled = false;
                 alert('Login successful!');
             } else {
                 alert(data.error || 'Login failed');
