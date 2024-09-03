@@ -31,8 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = getElement('submit-button');
     const authTitle = getElement('auth-title');
     const authForm = getElement('auth-form');
-    const usernameInput = document.getElementById('username-input');
-    const passwordInput = document.getElementById('password-input');
+    const usernameInput = getElement('username-input');
+    const emailInput = getElement('email-input');
+    const passwordInput = getElement('password-input');
     const authToggleLink = getElement('auth-toggle-link');
 
     let isLoginMode = true;
@@ -150,16 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkAnswer() {
         console.log("Checking answer");
-        // Implement this function
-    }
-
-    function login() {
-        console.log("Login attempted");
-        // Implement this function
-    }
-
-    function register() {
-        console.log("Registration attempted");
         // Implement this function
     }
 
