@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = getElement('submit-button');
     const authTitle = getElement('auth-title');
     const authForm = getElement('auth-form');
-    const emailInput = getElement('email-input');
-    const authSubmitButton = getElement('auth-submit-button');
+    const usernameInput = document.getElementById('username-input');
+    const passwordInput = document.getElementById('password-input');
     const authToggleLink = getElement('auth-toggle-link');
 
     let isLoginMode = true;
@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAuthMode();
     });
 
+    const authSubmitButton = document.getElementById('auth-submit-button');
     if (authSubmitButton) {
         console.log('Auth submit button found');
         authSubmitButton.addEventListener('click', function(e) {
